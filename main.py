@@ -51,9 +51,9 @@ def run_game():
     queue = Queue('action_commands', routing_key='action_command')
 
     conn =  Connection(
-        hostname='192.168.25.3',
-        userid='guest',
-        password='guest',
+        hostname='104.237.1.145',
+        userid='user',
+        password='user',
         virtual_host='beelze')
 
     worker = Worker(conn, ents)
@@ -111,14 +111,15 @@ def login_screen():
         password = r.get('password')
 
         if username and password:
-            url = 'http://localhost:11000/graphql/'
+            url = settings.server_url
             data = f'''
             mutation {{
-                logIn(username: "{username}" password: "{username}"){{
+                logIn(username: "{username}" password: "{password}"){{
                     token
                 }}
             }}
             '''
+
             rq = requests.post(url, json={'query': data}).json()
             if not rq['data']['logIn']:
                 r.delete('username')
@@ -134,4 +135,3 @@ def login_screen():
 login = login_screen()
 if login == 'logged':
     run_game()
-
