@@ -59,7 +59,7 @@ def run_game():
     #     virtual_host='beelze')
 
     print("creating new instance")
-    client = mqtt.Client("P1") #create new instance
+    client = mqtt.Client(client_id=username) #create new instance
 
 
     # worker = Worker(conn, ents)
