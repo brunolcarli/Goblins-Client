@@ -16,6 +16,7 @@ FONT = pygame.font.Font(None, 32)
 class InputBox:
 
     def __init__(self, x, y, w, h, screen, player, text=''):
+        self.reference = 'InputBox'
         self.rect = pygame.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -64,6 +65,7 @@ class InputBox:
 class DummyInputBox:
 
     def __init__(self, x, y, w, h, screen, text='', is_pwd=False):
+        self.reference = 'DummyBox'
         self.rect = pygame.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -145,3 +147,29 @@ class Worker(ConsumerMixin):
                 ent.rect.centery = content.get('y')
                 ent.blitme()
                 message.ack()
+
+broker_address='192.168.2.169'
+
+def on_message(client, userdata, message):
+    print("message received " , msgpack.unpackb(message.payload))
+
+class W:
+    def __init__(self, client, ents):
+        self.client = client
+        self.client.on_message = self.on_message
+        self.client.connect(broker_address, port=18883) #connect to broker
+        self.client.subscribe("foo/baz")
+        self.ents = ents
+
+    def on_message(self, client, userdata, message):
+        print("message received " , msgpack.unpackb(message.payload))
+        content = msgpack.unpackb(message.payload)
+        for ent in self.ents:
+            if ent.reference == content.get('reference'):
+                ent.rect.centerx = content.get('x')
+                ent.rect.centery = content.get('y')
+                ent.blitme()
+
+
+    def consume(self):
+        self.client.loop()

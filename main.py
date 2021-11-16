@@ -6,11 +6,13 @@ from core.settings import Settings
 from core.characters.goblin import Goblin
 import core.game_functions as gf
 from core.api_call import Query
-from core.util import InputBox, Worker, DummyInputBox
+from core.util import InputBox, Worker, DummyInputBox, W
 from kombu import Exchange
 from kombu.mixins import ConsumerMixin
 from kombu import Connection, Queue
 import redis
+
+import paho.mqtt.client as mqtt #import the client1
 
 pygame.init()
 
@@ -48,15 +50,20 @@ def run_game():
     ents.extend([input_box])
 
     # rabbit
-    queue = Queue('action_commands', routing_key='action_command')
+    # queue = Queue('action_commands', routing_key='action_command')
 
-    conn =  Connection(
-        hostname='104.237.1.145',
-        userid='user',
-        password='user',
-        virtual_host='beelze')
+    # conn =  Connection(
+    #     hostname='104.237.1.145',
+    #     userid='user',
+    #     password='user',
+    #     virtual_host='beelze')
 
-    worker = Worker(conn, ents)
+    print("creating new instance")
+    client = mqtt.Client("P1") #create new instance
+
+
+    # worker = Worker(conn, ents)
+    worker = W(client, ents)
 
     while True:
         # captura de eventos
@@ -66,10 +73,7 @@ def run_game():
 
         gf.update_screen(settings, screen, ents)
 
-        try:
-            next(worker.consume(timeout=1))
-        except:
-            pass
+        worker.consume()
 
 
 def login_screen():

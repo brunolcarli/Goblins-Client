@@ -8,4 +8,5 @@ class Settings:
 
         self.goblin_speed_factor = 2.5
 
-        self.server_url = 'http://104.237.1.145:11000/graphql/'
+        # self.server_url = 'http://104.237.1.145:11000/graphql/'
+        self.server_url = 'http://localhost:11000/graphql/'
